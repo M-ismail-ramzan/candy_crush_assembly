@@ -176,7 +176,7 @@ main proc
                         mov cx,cx
                         mov dx,dx
                         int 33h
-                       ; sub cx,100D
+                        sub cx,120D
                         .if((cx >= 40D) && (cx <= 180D))
                         ; Iniside the Board
                             ;1) find the Box where the Button is Pressed
