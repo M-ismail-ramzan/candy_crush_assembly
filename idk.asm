@@ -15,11 +15,23 @@
     double_triangle_candy_height dw 5D ; the width and the height of the shape
     double_triangle_middle_position dw ?
 
+    color_bomb_x_axis dw 10D
+    color_bomb_y_axis dw 10D
+    color_bomb_width dw 6D
+    color_bomb_height dw 1D
+    
     lollipop_candy_x_axis dw 10D
     lollipop_candy_y_axis dw 10D
-    lollipop_candy_width dw 6D
-    lollipop_candy_height dw 1D
-    
+    lollipop_candy_width dw 7D
+    lollipop_candy_height dw 6D
+    lollipop_candy_leggy dw 5D
+
+    butterfly_candy_x_axis dw 10D
+    butterfly_candy_y_axis dw 10D
+    butterfly_candy_width dw 12D   ; double of height
+    butterfly_candy_height dw 6D ; half of width
+    butterfly_candy_middle dw 5D
+
 .code
 main proc
                          mov   ax,@data
@@ -126,16 +138,45 @@ main proc
                         call block_proc
                         ; drawing the candy
                         ;call double_triangle_candy
-                        call lollipop_candy
+                        
+                       ; call color_bomb_candy
+
+                        ;call lollipop_candy
+                        call butterfly_candy
                         ;Populate the Grid...
                         ; 40D,30D -- 1x1
+  
+
+                        ; Now al, contains the Remainder... %3 so 0,1,2 or 3
+
+                        
                         mov double_triangle_candy_initial_x_position,46D
                         ; Fill the Board
                         fill_the_board:
                        mov double_triangle_candy_initial_y_position,20D
                         .While(double_triangle_candy_initial_y_position <= 150D)
                         add double_triangle_candy_initial_y_position,20D
+
+
+                    
+                        
+                        ; dl contains 1/100th seconds..and seconds
+                        mov ah,0
+                        int  1Ah    ; TIME - Get System time
+                        ; CX:DX = number of clock ticks since midnight
+                            ;  AL = midnight flag
+                         mov ax,0
+                         mov al,Dl
+                         mov ax,ax
+                         mov bl,3D
+                         div bl
+                           ; here dx contains the remainder of the division - from 0 to 9
+
+                        
+                        .if(ah == 0d)
                         call double_triangle_candy
+                        .endif
+                        
                         .ENDW
                         
                          .While(double_triangle_candy_initial_x_position <= 150D)
@@ -302,14 +343,165 @@ block_proc proc
 
 ret
 block_proc endp
-; this is the lollipop candy
+;The code for the Butterfly Candy...
+butterfly_candy proc
+  ; Defining the initial Positions
+MOV CX, butterfly_candy_x_axis
+mov Dx,butterfly_candy_y_axis
+
+butterfly_candy_horizontal:
+    ; drawing a pixel
+    mov ah,0ch
+    mov al,09h
+    mov bh,00h
+    int 10H
+    inc CX ; increase the x-axis
+    ; compare the x-axis with the ball size cx - ball-x-position > size ( go to next line)
+    mov ax,CX 
+    sub ax,butterfly_candy_x_axis
+    .while (ax < butterfly_candy_width)
+    jmp butterfly_candy_horizontal 
+    .endw 
+    
+    mov cx,butterfly_candy_x_axis
+    mov dx,butterfly_candy_y_axis
+butterfly_candy_left_first_tilt:
+    mov ah,0ch
+    mov al,09h
+    mov bh,00h
+    int 10H 
+    inc cx
+    inc dx
+    mov ax,CX 
+    sub ax,butterfly_candy_x_axis
+    .while (ax < butterfly_candy_height)
+    jmp butterfly_candy_left_first_tilt 
+    .endw 
+    ;changing x-axis and y-axis position..
+    mov di,butterfly_candy_x_axis
+    mov butterfly_candy_x_axis,cx
+    mov butterfly_candy_y_axis,dx
+butterfly_candy_right_first_tilt:
+    mov ah,0ch
+    mov al,09h
+    mov bh,00h
+    int 10H 
+    inc cx
+    dec dx
+    mov ax,CX 
+    sub ax,butterfly_candy_x_axis
+    .while (ax < butterfly_candy_height)
+    jmp butterfly_candy_right_first_tilt 
+    .endw 
+
+    
+    mov cx,butterfly_candy_x_axis
+    mov dx,butterfly_candy_y_axis
+    butterfly_candy_right_second_tilt:
+    mov ah,0ch
+    mov al,09h
+    mov bh,00h
+    int 10H 
+    inc cx
+    inc dx
+    mov ax,CX 
+    sub ax,butterfly_candy_x_axis
+    .while (ax < butterfly_candy_height)
+    jmp butterfly_candy_right_second_tilt 
+    .endw 
+
+    mov si,butterfly_candy_x_axis
+    sub si,butterfly_candy_height
+   ; add si,2D
+    mov cx,butterfly_candy_x_axis
+    mov dx,butterfly_candy_y_axis
+     butterfly_candy_straight_second_tilt:
+    mov ah,0ch
+    mov al,09h
+    mov bh,00h
+    int 10H 
+    dec cx
+    inc dx
+    mov ax,CX 
+    sub ax,si
+    mov butterfly_candy_x_axis,cx
+    mov butterfly_candy_y_axis,dx
+    .while (ax < butterfly_candy_width)
+    jmp butterfly_candy_straight_second_tilt 
+    .endw 
+
+
+    mov cx,di
+    mov dx,butterfly_candy_y_axis
+    draw_straight_final_line:
+    mov ah,0ch
+    mov al,09h
+    mov bh,00h
+    int 10H 
+    inc cx
+     mov ax,CX 
+    sub ax,di
+    .while (ax < butterfly_candy_width)
+    jmp draw_straight_final_line 
+    .endw 
+   
+ret
+butterfly_candy endp
+;This is the Lollipop Cnady...
+
 lollipop_candy proc
 ; Defining the initial Positions
+MOV CX, lollipop_candy_x_axis
+mov Dx,lollipop_candy_y_axis
 
-mov si,lollipop_candy_width
+lollipop_candy_horizontal:
+    ; drawing a pixel
+    mov ah,0ch
+    mov al,09h
+    mov bh,00h
+    int 10H
+    inc CX ; increase the x-axis
+    ; compare the x-axis with the ball size cx - ball-x-position > size ( go to next line)
+    mov ax,CX 
+    sub ax,lollipop_candy_x_axis
+    .while (ax < lollipop_candy_width)
+    jmp lollipop_candy_horizontal 
+    .endw
+
+    inc dx
+    mov cx,lollipop_candy_x_axis
+    mov ax,Dx
+    sub ax,lollipop_candy_y_axis
+    .while (ax < lollipop_candy_height)
+    jmp lollipop_candy_horizontal 
+    .endw
+
+    ;Drawing the Leg of the Lollipop candy..
+    mov lollipop_candy_y_axis,dx
+    add cx,3D
+    lollipop_candy_leg:
+     mov ah,0ch
+    mov al,09h
+    mov bh,00h
+    int 10H
+    inc dx
+    mov ax,dx
+    sub ax,lollipop_candy_y_axis
+    
+    .while(ax < lollipop_candy_leggy)
+    jmp lollipop_candy_leg
+    .endw
+
+ret
+lollipop_candy endp
+; this is the color bomb candy
+color_bomb_candy proc
+; Defining the initial Positions
+
+mov si,color_bomb_width
 .while(si != 12D)
-    MOV CX, lollipop_candy_x_axis
-    mov Dx,lollipop_candy_y_axis
+    MOV CX, color_bomb_x_axis
+    mov Dx,color_bomb_y_axis
     mov al,04h
     draw_lollipop_horizontal:
         ; drawing a pixel
@@ -320,30 +512,30 @@ mov si,lollipop_candy_width
         inc CX ; increase the x-axis
         ; compare the x-axis with the ball size cx - ball-x-position > size ( go to next line)
         mov ax,CX 
-        sub ax,lollipop_candy_x_axis
-        .while (ax < lollipop_candy_width)
+        sub ax,color_bomb_x_axis
+        .while (ax < color_bomb_width)
         jmp draw_lollipop_horizontal 
         .endw
 
         add dx,1
-        mov cx,lollipop_candy_x_axis
+        mov cx,color_bomb_x_axis
         mov ax,Dx
-        sub ax, lollipop_candy_y_axis
-        .while(ax < lollipop_candy_height)
+        sub ax, color_bomb_y_axis
+        .while(ax < color_bomb_height)
         jmp draw_lollipop_horizontal
         .endw
         add si,2D
      ;   add dx,1D
-      sub lollipop_candy_x_axis,1D
-        add lollipop_candy_y_axis,2D  
-        add lollipop_candy_width,2D
+      sub color_bomb_x_axis,1D
+        add color_bomb_y_axis,2D  
+        add color_bomb_width,2D
         inc al
     .endw
 
     mov si,6D
 .while(si != 14D)
-    MOV CX, lollipop_candy_x_axis
-    mov Dx,lollipop_candy_y_axis
+    MOV CX, color_bomb_x_axis
+    mov Dx,color_bomb_y_axis
     mov al,01h
     draw_lollipop_horizontal_1:
         ; drawing a pixel
@@ -354,27 +546,27 @@ mov si,lollipop_candy_width
         inc CX ; increase the x-axis
         ; compare the x-axis with the ball size cx - ball-x-position > size ( go to next line)
         mov ax,CX 
-        sub ax,lollipop_candy_x_axis
-        .while (ax < lollipop_candy_width)
+        sub ax,color_bomb_x_axis
+        .while (ax < color_bomb_width)
         jmp draw_lollipop_horizontal_1 
         .endw
 
         add dx,1
-        mov cx,lollipop_candy_x_axis
+        mov cx,color_bomb_x_axis
         mov ax,Dx
-        sub ax, lollipop_candy_y_axis
-        .while(ax < lollipop_candy_height)
+        sub ax, color_bomb_y_axis
+        .while(ax < color_bomb_height)
         jmp draw_lollipop_horizontal_1
         .endw
         add si,2D
      ;   add dx,1D
-     add lollipop_candy_x_axis,1D
-        add lollipop_candy_y_axis,2D  
-        sub lollipop_candy_width,2D
+     add color_bomb_x_axis,1D
+        add color_bomb_y_axis,2D  
+        sub color_bomb_width,2D
         inc al
     .endw
-    
-lollipop_candy endp
+    ret
+color_bomb_candy endp
 
 double_triangle_candy proc
         
