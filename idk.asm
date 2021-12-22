@@ -17,11 +17,11 @@
 
     color_bomb_x_axis dw 20D
     color_bomb_y_axis dw 20D
-    color_bomb_x_helper dw ?
-    color_bomb_y_helper dw ?
     color_bomb_width dw 6D
     color_bomb_height dw 1D
     
+    swapping_helper dw ?
+
     lollipop_candy_x_axis dw 10D
     lollipop_candy_y_axis dw 60D
     lollipop_candy_width dw 7D
@@ -52,7 +52,7 @@ main proc
                          ; Defining the initial Positions
                          MOV   CX, xaxis
                          mov   Dx, yaxis
-                             call color_bomb_candy
+                            ; call color_bomb_candy
                          draw_horizaontal_lines:
                          ; drawing a pixel
                          mov   ah,0ch
@@ -159,43 +159,58 @@ main proc
                         mov si, offset arr
                         mov di,1d
                         .while(di <= 49d)
-                        add double_triangle_candy_initial_y_position,20D
-                        ;gENERATE THE random Numbers,,,
-                        mov ah,0
-                        int  1Ah    ; TIME - Get System time
-                        ; CX:DX = number of clock ticks since midnight
-                            ;  AL = midnight flag
-                         mov ax,0
-                         add dx,di
-                         mov al,Dl
-                         
-                         mov bl,3D
-                         div bl
-                        ; Now add the data to the array
-                        mov [si],ah
-                        add di,1D
-                        inc si
-                        .if(ah == 0D)
-                        call double_triangle_candy      
-                        .ELSEIF(ah == 2D)
-                       mov dx,double_triangle_candy_initial_x_position
-                     mov color_bomb_x_axis,dx
-                        mov dx,double_triangle_candy_initial_y_position
-                        mov color_bomb_y_axis,dx
-                        ;call color_bomb_candy
-                      
-                        .ELSEIF(ah == 1D)
-                        mov dx,double_triangle_candy_initial_x_position
-                        mov lollipop_candy_x_axis,dx
-                        mov dx,double_triangle_candy_initial_y_position
-                        mov lollipop_candy_y_axis,dx
-                        ;sub lollipop_candy_y_axis,1d
-                        call lollipop_candy
-                        .endif
-                        .if(di == 8D || di == 15D || di == 22d || di == 29d ||  di == 36d || DI == 43D)
-                        add double_triangle_candy_initial_x_position,20D
-                        mov double_triangle_candy_initial_y_position,20D
-                        .endif
+                            add double_triangle_candy_initial_y_position,20D
+                            ;gENERATE THE random Numbers,,,
+                            mov ah,2ch
+                            int 21h
+                            ;int  1Ah    ; TIME - Get System time
+                            ; CX:DX = number of clock ticks since midnight
+                                ;  AL = midnight flag
+                            mov ax,0
+                            add dx,di
+                            add dx,double_triangle_candy_initial_x_position
+                            mov al,Dl
+                            
+                            mov bl,4D
+                            div bl
+                            ; Now add the data to the array
+                           ; mov [si],ah
+                            add di,1D
+                                   
+                            mov [arr+si],ah
+                            inc si
+                            ;Specifying only avaliable..
+                            .if(!(di == 1D || di == 2D || di == 3D|| di == 5D || di == 7D || di == 8D ||di == 23D || di == 29D || di == 44D || di == 45D || di == 47D || di == 49D  || di == 50D))
+                                .if(ah == 0D)
+                                        call double_triangle_candy                            
+                                .ELSEIF(ah == 1D)
+                                        mov bx,double_triangle_candy_initial_x_position
+                                        mov lollipop_candy_x_axis,bx
+                                        mov bx,double_triangle_candy_initial_y_position
+                                        mov lollipop_candy_y_axis,bx
+                                        call lollipop_candy
+                                .ELSEIF(ah == 2D)
+                                        mov bx,0
+                                        mov bx,double_triangle_candy_initial_x_position
+                                        mov butterfly_candy_x_axis,bx
+                                        mov bx,double_triangle_candy_initial_y_position
+                                        mov butterfly_candy_y_axis,bx
+                                        call butterfly_candy
+                                .ELSEIF(ah == 3D)
+                                        mov bx,0
+                                        mov bx,double_triangle_candy_initial_x_position
+                                        add bx,2D
+                                        mov color_bomb_x_axis,bx
+                                        mov bx,double_triangle_candy_initial_y_position
+                                        sub bx,5d
+                                        mov color_bomb_y_axis,bx
+                                        call color_bomb_candy
+                                .endif
+                            .endif
+                            .if(di == 8D || di == 15D || di == 22d || di == 29d ||  di == 36d || DI == 43D)
+                                add double_triangle_candy_initial_x_position,20D
+                                mov double_triangle_candy_initial_y_position,20D
+                            .endif
                         .endw
 
 
@@ -259,22 +274,82 @@ main proc
                             ;1) find the Box where the Button is Pressed
                                 .if( (cx >= 40D) && (cx <= 60D))
                                     .if((dx >= 30D) && (dx<=50D))
-                                    mov   ah,0ch
-                                    mov   al,05h
-                                    mov   bh,00h
-                                    int   10H
+                                     mov si,0
+                                        
+                                        mov   ah,0ch
+                                        mov   al,05h
+                                        mov   bh,00h
+                                        int   10H
                                     .endif
                                     ; drawing a pixel
-                                
-                                    
-                                
+                                    .if((dx >= 50D) && (dx<=70D))
+                                     mov si,0
+                                        
+                                        mov   ah,0ch
+                                        mov   al,05h
+                                        mov   bh,00h
+                                        int   10H
+                                    .endif
+
+                                    .if((dx >= 70D) && (dx<=90D))
+                                        mov si,3D
+                                        mov swapping_helper,si           
+                                        call swapping_identifier       
+                                    .endif
+
+                                    .if((dx >= 90D) && (dx<=110D))
+                                        mov si,4D
+                                        mov swapping_helper,si              
+                                        call swapping_identifier       
+                                    .endif
+
+                                    .if((dx >= 110D) && (dx<=130D))
+                                        mov si,5D
+                                        mov swapping_helper,si               
+                                        call swapping_identifier       
+                                    .endif
+                                    ; FOR SECOND COLUMN
                                 .ELSEIF( (cx >= 60D) && (cx <= 80D))
-                                ; drawing a pixel
-                            
-                                mov   ah,0ch
-                                mov   al,02h
-                                mov   bh,00h
-                                int   10H
+                                     .if((dx >= 30D) && (dx<=50D))
+                                         mov si,8D
+                                        mov swapping_helper,si               
+                                        call swapping_identifier
+                                    .endif 
+                                    ; drawing a pixel
+                                    .if((dx >= 50D) && (dx<=70D))
+                                        mov si,9D
+                                        mov swapping_helper, si              
+                                        call swapping_identifier 
+                                    .endif 
+                                    .if((dx >= 70D) && (dx<=90D))
+                                        mov si,10D
+                                        mov swapping_helper,si          
+                                        call swapping_identifier       
+                                    .endif
+
+                                    .if((dx >= 90D) && (dx<=110D))
+                                        mov si,11D
+                                        mov swapping_helper,si              
+                                        call swapping_identifier       
+                                    .endif
+
+                                    .if((dx >= 110D) && (dx<=130D))
+                                        mov si,12D
+                                        mov swapping_helper,si               
+                                        call swapping_identifier       
+                                    .endif
+                                     .if((dx >= 130D) && (dx<=150D))
+                                        mov si,13D
+                                        mov swapping_helper,si               
+                                        call swapping_identifier       
+                                    .endif
+                                     .if((dx >= 150D) && (dx<=170D))
+                                        mov si,14D
+
+                                       ; mov arr[si],2D
+                                        mov swapping_helper,si               
+                                        call swapping_identifier       
+                                    .endif
                             
                                 .ELSEIF( (cx >= 80D) && (cx <= 100D))
                                 ; drawing a pixel
@@ -333,11 +408,35 @@ main proc
 
 main endp
 
+swapping_identifier proc uses ax bx cx dx si
 
-
-blocky_caller proc
+                                        mov si,swapping_helper
+                                    .if([arr+si] == 0D)
+                                        ; make spenceer
+                                        mov double_triangle_candy_initial_x_position,20D
+                                        mov double_triangle_candy_initial_x_position,20D
+                                        call double_triangle_candy
+                                        .endif
+                                        .if([arr+si] == 1D)
+                                        ; make spenceer
+                                        mov lollipop_candy_x_axis,20D
+                                        mov lollipop_candy_y_axis,20D
+                                         call lollipop_candy
+                                        .endif
+                                        .if([arr+si] == 2D)
+                                        ; make spenceer
+                                        mov butterfly_candy_x_axis,20D
+                                        mov butterfly_candy_y_axis,40D
+                                        call butterfly_candy
+                                        .endif
+                                         .if([arr+si] == 3D)
+                                        ; make spenceer
+                                        mov color_bomb_x_axis,20D
+                                        mov color_bomb_y_axis,40D
+                                         call color_bomb_candy
+                                        .endif
 ret
-blocky_caller endp
+swapping_identifier endp
 
 block_proc proc
                          MOV   CX, block_helper_var_1
@@ -368,7 +467,7 @@ block_proc proc
 ret
 block_proc endp
 ;The code for the Butterfly Candy...
-butterfly_candy proc
+butterfly_candy proc uses di ax bx cx dx 
   ; Defining the initial Positions
 MOV CX, butterfly_candy_x_axis
 mov Dx,butterfly_candy_y_axis
@@ -519,7 +618,7 @@ lollipop_candy_horizontal:
 ret
 lollipop_candy endp
 ; this is the color bomb candy
-color_bomb_candy proc
+color_bomb_candy proc uses ax bx cx dx di si 
 ; Defining the initial Positions
 
 mov si,color_bomb_width
