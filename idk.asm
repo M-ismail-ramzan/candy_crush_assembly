@@ -141,16 +141,7 @@ main proc
 
                         ; This code check's when the Left key of the Mouse if Pressed
                         left_key_pressed:
-                        mov ax,1
-                        int 33h
                         again:
-
-                        mov ax,3
-                        int 33h
-
-                        ;set cursor position
-                        mov ax,4
-                        int 33h
                         ; get draw info
                         mov ax,5
                         mov bx,0
@@ -158,11 +149,106 @@ main proc
                         cmp ax,1
                         jne again
 
+                        ; setting the Mouse Position..
+                      ; mov ax,04h
+                     ;   mov cx,50D
+                     ;   mov dx,30D
+                        ;mov cx,0
+                        ;mov dx,0
+                       ; mov ax,03  
+                       ; mov ax,20h
+                       ; int 33h
+                       ; mov ax,01h
+                       ; int 33h
+
+                        
+                     ;    mov cx,0
+                     ;   mov dx,0
+
+                       mov ax,03  
+                       int 33h
+
                         ; Perform anything in here..
                         ; we have the x-corrdinates and Y-corrdinates...
-                        
-                        loop left_key_pressed
+                         mov ax,01h
+                        int 33h
+                        mov ax,04h
+                        mov cx,cx
+                        mov dx,dx
+                        int 33h
+                       ; sub cx,100D
+                        .if((cx >= 40D) && (cx <= 180D))
+                        ; Iniside the Board
+                            ;1) find the Box where the Button is Pressed
+                                .if( (cx >= 40D) && (cx <= 60D))
+                                    .if((dx >= 30D) && (dx<=50D))
+                                    mov   ah,0ch
+                                    mov   al,05h
+                                    mov   bh,00h
+                                    int   10H
+                                    .endif
+                                    ; drawing a pixel
+                                
+                                    
+                                
+                                .ELSEIF( (cx >= 60D) && (cx <= 80D))
+                                ; drawing a pixel
+                            
+                                mov   ah,0ch
+                                mov   al,02h
+                                mov   bh,00h
+                                int   10H
+                            
+                                .ELSEIF( (cx >= 80D) && (cx <= 100D))
+                                ; drawing a pixel
+                            
+                                mov   ah,0ch
+                                mov   al,0fh
+                                mov   bh,00h
+                                int   10H
+                                
+                                .ELSEIF( (cx >= 100D) && (cx <= 120D))
+                                ; drawing a pixel
+                            
+                                mov   ah,0ch
+                                mov   al,04h
+                                mov   bh,00h
+                                int   10H
 
+                                .ELSEIF( (cx >= 120D) && (cx <= 140D))
+                                ; drawing a pixel
+                            
+                                mov   ah,0ch
+                                mov   al,07h
+                                mov   bh,00h
+                                int   10H
+
+                                .ELSEIF( (cx >= 140D) && (cx <= 160D))
+                                ; drawing a pixel
+                            
+                                mov   ah,0ch
+                                mov   al,08h
+                                mov   bh,00h
+                                int   10H
+                                .ELSE
+                                mov   ah,0ch
+                                mov   al,10h
+                                mov   bh,00h
+                                int   10H
+                                .endif 
+
+                            
+                          ;2) Remove the Candy from that Box
+                          ;3) Check where the User has made Movement
+                          ;4) Move the removed candy to that new Box
+                          ;5) Bring the old candy to the new Box...
+                          ;6) Check if there  is some crush
+                          ; 7) if there is then do bubble
+                          ; 8) else remove the above steps and move the candy back's 
+                        .endif
+
+                        cmp cx,99D
+                        jne left_key_pressed
 
                          MOV   AH,4ch
                          int   21h
