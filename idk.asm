@@ -14,7 +14,12 @@
     double_triangle_candy_width dw 8D
     double_triangle_candy_height dw 5D ; the width and the height of the shape
     double_triangle_middle_position dw ?
-    candy_arr dw 1,2,3,4,5,6,7,8,9
+
+    lollipop_candy_x_axis dw 10D
+    lollipop_candy_y_axis dw 10D
+    lollipop_candy_width dw 6D
+    lollipop_candy_height dw 1D
+    
 .code
 main proc
                          mov   ax,@data
@@ -88,7 +93,7 @@ main proc
 
                         ; Now grid has been made..
                         ; let's block the GRIDs..
-                        ; BLOCKING THE FIRST ROW....                        
+                        ; BLOCKING THE FIRST col....                        
                         mov block_helper_var_2,30D
                         .WHILE(block_helper_var_2 <= 150D)
                         mov block_helper_var_1,40D
@@ -121,7 +126,7 @@ main proc
                         call block_proc
                         ; drawing the candy
                         ;call double_triangle_candy
-
+                        call lollipop_candy
                         ;Populate the Grid...
                         ; 40D,30D -- 1x1
                         mov double_triangle_candy_initial_x_position,46D
@@ -170,14 +175,21 @@ main proc
 
                         ; Perform anything in here..
                         ; we have the x-corrdinates and Y-corrdinates...
-                         mov ax,01h
+                      mov ax,01h
                         int 33h
-                        mov ax,04h
-                        mov cx,cx
-                        mov dx,dx
-                        int 33h
-                        sub cx,120D
-                        .if((cx >= 40D) && (cx <= 180D))
+                     
+                        ;sub cx,120D
+                        ; Important CODE for Exact Mouse Positions..!!
+                       ; mov dx,0
+                        mov ax,CX
+                        mov bl,2
+                        div bl
+                        add ax,0                
+                        mov cx,ax
+
+                         
+
+                        .if((cx >= 00D) && (cx <= 320D))
                         ; Iniside the Board
                             ;1) find the Box where the Button is Pressed
                                 .if( (cx >= 40D) && (cx <= 60D))
@@ -290,6 +302,80 @@ block_proc proc
 
 ret
 block_proc endp
+; this is the lollipop candy
+lollipop_candy proc
+; Defining the initial Positions
+
+mov si,lollipop_candy_width
+.while(si != 12D)
+    MOV CX, lollipop_candy_x_axis
+    mov Dx,lollipop_candy_y_axis
+    mov al,04h
+    draw_lollipop_horizontal:
+        ; drawing a pixel
+        mov ah,0ch
+        ;mov al,04h
+        mov bh,00h
+        int 10H
+        inc CX ; increase the x-axis
+        ; compare the x-axis with the ball size cx - ball-x-position > size ( go to next line)
+        mov ax,CX 
+        sub ax,lollipop_candy_x_axis
+        .while (ax < lollipop_candy_width)
+        jmp draw_lollipop_horizontal 
+        .endw
+
+        add dx,1
+        mov cx,lollipop_candy_x_axis
+        mov ax,Dx
+        sub ax, lollipop_candy_y_axis
+        .while(ax < lollipop_candy_height)
+        jmp draw_lollipop_horizontal
+        .endw
+        add si,2D
+     ;   add dx,1D
+      sub lollipop_candy_x_axis,1D
+        add lollipop_candy_y_axis,2D  
+        add lollipop_candy_width,2D
+        inc al
+    .endw
+
+    mov si,6D
+.while(si != 14D)
+    MOV CX, lollipop_candy_x_axis
+    mov Dx,lollipop_candy_y_axis
+    mov al,01h
+    draw_lollipop_horizontal_1:
+        ; drawing a pixel
+        mov ah,0ch
+        
+        mov bh,00h
+        int 10H
+        inc CX ; increase the x-axis
+        ; compare the x-axis with the ball size cx - ball-x-position > size ( go to next line)
+        mov ax,CX 
+        sub ax,lollipop_candy_x_axis
+        .while (ax < lollipop_candy_width)
+        jmp draw_lollipop_horizontal_1 
+        .endw
+
+        add dx,1
+        mov cx,lollipop_candy_x_axis
+        mov ax,Dx
+        sub ax, lollipop_candy_y_axis
+        .while(ax < lollipop_candy_height)
+        jmp draw_lollipop_horizontal_1
+        .endw
+        add si,2D
+     ;   add dx,1D
+     add lollipop_candy_x_axis,1D
+        add lollipop_candy_y_axis,2D  
+        sub lollipop_candy_width,2D
+        inc al
+    .endw
+    
+lollipop_candy endp
+
 double_triangle_candy proc
         
 
