@@ -15,23 +15,26 @@
     double_triangle_candy_height dw 5D ; the width and the height of the shape
     double_triangle_middle_position dw ?
 
-    color_bomb_x_axis dw 10D
-    color_bomb_y_axis dw 10D
+    color_bomb_x_axis dw 20D
+    color_bomb_y_axis dw 20D
+    color_bomb_x_helper dw ?
+    color_bomb_y_helper dw ?
     color_bomb_width dw 6D
     color_bomb_height dw 1D
     
     lollipop_candy_x_axis dw 10D
-    lollipop_candy_y_axis dw 10D
+    lollipop_candy_y_axis dw 60D
     lollipop_candy_width dw 7D
     lollipop_candy_height dw 6D
     lollipop_candy_leggy dw 5D
 
     butterfly_candy_x_axis dw 10D
-    butterfly_candy_y_axis dw 10D
-    butterfly_candy_width dw 12D   ; double of height
-    butterfly_candy_height dw 6D ; half of width
+    butterfly_candy_y_axis dw 80D
+    butterfly_candy_width dw 6D   ; double of height
+    butterfly_candy_height dw 3D ; half of width
     butterfly_candy_middle dw 5D
 
+    arr db 49 dup(?)
 .code
 main proc
                          mov   ax,@data
@@ -49,7 +52,7 @@ main proc
                          ; Defining the initial Positions
                          MOV   CX, xaxis
                          mov   Dx, yaxis
-
+                             call color_bomb_candy
                          draw_horizaontal_lines:
                          ; drawing a pixel
                          mov   ah,0ch
@@ -141,48 +144,69 @@ main proc
                         
                        ; call color_bomb_candy
 
-                        ;call lollipop_candy
-                        call butterfly_candy
+                      ;  call lollipop_candy
+                     ;   call butterfly_candy
+                      ;   call color_bomb_candy
                         ;Populate the Grid...
                         ; 40D,30D -- 1x1
-  
-
-                        ; Now al, contains the Remainder... %3 so 0,1,2 or 3
 
                         
+
                         mov double_triangle_candy_initial_x_position,46D
-                        ; Fill the Board
-                        fill_the_board:
-                       mov double_triangle_candy_initial_y_position,20D
-                        .While(double_triangle_candy_initial_y_position <= 150D)
-                        add double_triangle_candy_initial_y_position,20D
-
-
-                    
+                        mov double_triangle_candy_initial_y_position,20D
+                      
                         
-                        ; dl contains 1/100th seconds..and seconds
+                        mov si, offset arr
+                        mov di,1d
+                        .while(di <= 49d)
+                        add double_triangle_candy_initial_y_position,20D
+                        ;gENERATE THE random Numbers,,,
                         mov ah,0
                         int  1Ah    ; TIME - Get System time
                         ; CX:DX = number of clock ticks since midnight
                             ;  AL = midnight flag
                          mov ax,0
+                         add dx,di
                          mov al,Dl
-                         mov ax,ax
+                         
                          mov bl,3D
                          div bl
-                           ; here dx contains the remainder of the division - from 0 to 9
+                        ; Now add the data to the array
+                        mov [si],ah
+                        add di,1D
+                        inc si
+                        .if(ah == 0D)
+                        call double_triangle_candy      
+                        .ELSEIF(ah == 2D)
+                       mov dx,double_triangle_candy_initial_x_position
+                     mov color_bomb_x_axis,dx
+                        mov dx,double_triangle_candy_initial_y_position
+                        mov color_bomb_y_axis,dx
+                        ;call color_bomb_candy
+                      
+                        .ELSEIF(ah == 1D)
+                        mov dx,double_triangle_candy_initial_x_position
+                        mov lollipop_candy_x_axis,dx
+                        mov dx,double_triangle_candy_initial_y_position
+                        mov lollipop_candy_y_axis,dx
+                        ;sub lollipop_candy_y_axis,1d
+                        call lollipop_candy
+                        .endif
+                        .if(di == 8D || di == 15D || di == 22d || di == 29d ||  di == 36d || DI == 43D)
+                        add double_triangle_candy_initial_x_position,20D
+                        mov double_triangle_candy_initial_y_position,20D
+                        .endif
+                        .endw
+
+
+
+                        ; Now al, contains the Remainder... %3 so 0,1,2 or 3
 
                         
-                        .if(ah == 0d)
-                        call double_triangle_candy
-                        .endif
-                        
-                        .ENDW
-                        
-                         .While(double_triangle_candy_initial_x_position <= 150D)
-                        add double_triangle_candy_initial_x_position,20D
-                        jmp fill_the_board
-                        .ENDW
+                      
+                         
+                      ;  jmp fill_the_board
+                       ; .ENDW
 
 
                         ; This code check's when the Left key of the Mouse if Pressed
@@ -300,7 +324,7 @@ main proc
                           ; 8) else remove the above steps and move the candy back's 
                         .endif
 
-                        cmp cx,99D
+                        cmp cx,9999D
                         jne left_key_pressed
 
                          MOV   AH,4ch
